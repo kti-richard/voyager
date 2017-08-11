@@ -12,7 +12,6 @@ import (
 
 	"github.com/miekg/dns"
 	"golang.org/x/net/publicsuffix"
-	"github.com/tamalsaha/go-oneliners"
 )
 
 type preCheckDNSFunc func(fqdn, value string) (bool, error)
@@ -236,11 +235,9 @@ func lookupNameservers(fqdn string) ([]string, error) {
 // domain labels until the nameserver returns a SOA record in the answer section.
 func FindZoneByFqdn(fqdn string, nameservers []string) (string, error) {
 	// Do we have it cached?
-	oneliners.FILE(fqdnToZone)
 	if zone, ok := fqdnToZone[fqdn]; ok {
 		return zone, nil
 	}
-	oneliners.FILE(dns.TypeSOA, nameservers, true)
 
 	labelIndexes := dns.Split(fqdn)
 	for _, index := range labelIndexes {
@@ -250,40 +247,30 @@ func FindZoneByFqdn(fqdn string, nameservers []string) (string, error) {
 			break
 		}
 
-		oneliners.FILE(domain, dns.TypeSOA, nameservers, true)
 		in, err := dnsQuery(domain, dns.TypeSOA, nameservers, true)
 		if err != nil {
-			oneliners.FILE(err)
 			return "", err
 		}
 
 		// Any response code other than NOERROR and NXDOMAIN is treated as error
 		if in.Rcode != dns.RcodeNameError && in.Rcode != dns.RcodeSuccess {
-			oneliners.FILE()
 			return "", fmt.Errorf("Unexpected response code '%s' for %s",
 				dns.RcodeToString[in.Rcode], domain)
 		}
-		oneliners.FILE(in.Rcode)
+
 		// Check if we got a SOA RR in the answer section
 		if in.Rcode == dns.RcodeSuccess {
-			oneliners.FILE()
 			for _, ans := range in.Answer {
-				oneliners.FILE()
 				if soa, ok := ans.(*dns.SOA); ok {
-					oneliners.FILE("fqdn:", fqdn)
-					oneliners.FILE("soa.Hdr.Name:", soa.Hdr.Name)
 					if strings.HasSuffix(fqdn, soa.Hdr.Name) {
-						oneliners.FILE()
 						zone := soa.Hdr.Name
 						fqdnToZone[fqdn] = zone
 						return zone, nil
 					} else if zone, err := publicsuffix.EffectiveTLDPlusOne(UnFqdn(fqdn)); err == nil {
-						oneliners.FILE()
 						zone = ToFqdn(zone)
 						fqdnToZone[fqdn] = zone
 						return zone, nil
 					} else {
-						oneliners.FILE()
 						zone = soa.Hdr.Name
 						fqdnToZone[fqdn] = zone
 						return zone, nil
