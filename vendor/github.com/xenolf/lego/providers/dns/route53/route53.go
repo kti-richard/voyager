@@ -15,6 +15,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/route53"
 	"github.com/xenolf/lego/acme"
+	"github.com/tamalsaha/go-oneliners"
 )
 
 const (
@@ -66,6 +67,11 @@ func (d customRetryer) RetryRules(r *request.Request) time.Duration {
 // See also: https://github.com/aws/aws-sdk-go/wiki/configuring-sdk
 func NewDNSProvider() (*DNSProvider, error) {
 	hostedZoneID := os.Getenv("AWS_HOSTED_ZONE_ID")
+
+	oneliners.FILE("AWS_ACCESS_KEY_ID:", os.Getenv("AWS_ACCESS_KEY_ID"))
+	oneliners.FILE("AWS_SECRET_ACCESS_KEY:", os.Getenv("AWS_SECRET_ACCESS_KEY"))
+	oneliners.FILE("AWS_REGION:", os.Getenv("AWS_REGION"))
+	oneliners.FILE("AWS_SESSION_TOKEN:", os.Getenv("AWS_SESSION_TOKEN"))
 
 	r := customRetryer{}
 	r.NumMaxRetries = maxRetries
@@ -135,6 +141,13 @@ func (r *DNSProvider) changeRecord(action, fqdn, value string, ttl int) error {
 }
 
 func (r *DNSProvider) getHostedZoneID(fqdn string) (string, error) {
+
+
+	oneliners.FILE("AWS_ACCESS_KEY_ID:", os.Getenv("AWS_ACCESS_KEY_ID"))
+	oneliners.FILE("AWS_SECRET_ACCESS_KEY:", os.Getenv("AWS_SECRET_ACCESS_KEY"))
+	oneliners.FILE("AWS_REGION:", os.Getenv("AWS_REGION"))
+	oneliners.FILE("AWS_SESSION_TOKEN:", os.Getenv("AWS_SESSION_TOKEN"))
+
 	if r.hostedZoneID != "" {
 		return r.hostedZoneID, nil
 	}
