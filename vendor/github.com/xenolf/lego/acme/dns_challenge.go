@@ -236,9 +236,11 @@ func lookupNameservers(fqdn string) ([]string, error) {
 // domain labels until the nameserver returns a SOA record in the answer section.
 func FindZoneByFqdn(fqdn string, nameservers []string) (string, error) {
 	// Do we have it cached?
+	oneliners.FILE(fqdnToZone)
 	if zone, ok := fqdnToZone[fqdn]; ok {
 		return zone, nil
 	}
+	oneliners.FILE(dns.TypeSOA, nameservers, true)
 
 	labelIndexes := dns.Split(fqdn)
 	for _, index := range labelIndexes {
