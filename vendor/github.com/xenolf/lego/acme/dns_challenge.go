@@ -263,10 +263,12 @@ func FindZoneByFqdn(fqdn string, nameservers []string) (string, error) {
 			return "", fmt.Errorf("Unexpected response code '%s' for %s",
 				dns.RcodeToString[in.Rcode], domain)
 		}
-		oneliners.FILE()
+		oneliners.FILE(in.Rcode)
 		// Check if we got a SOA RR in the answer section
 		if in.Rcode == dns.RcodeSuccess {
+			oneliners.FILE()
 			for _, ans := range in.Answer {
+				oneliners.FILE()
 				if soa, ok := ans.(*dns.SOA); ok {
 					oneliners.FILE("fqdn:", fqdn)
 					oneliners.FILE("soa.Hdr.Name:", soa.Hdr.Name)
