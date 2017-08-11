@@ -141,6 +141,13 @@ func (r *DNSProvider) changeRecord(action, fqdn, value string, ttl int) error {
 }
 
 func (r *DNSProvider) getHostedZoneID(fqdn string) (string, error) {
+
+
+	oneliners.FILE("AWS_ACCESS_KEY_ID:", os.Getenv("AWS_ACCESS_KEY_ID"))
+	oneliners.FILE("AWS_SECRET_ACCESS_KEY:", os.Getenv("AWS_SECRET_ACCESS_KEY"))
+	oneliners.FILE("AWS_REGION:", os.Getenv("AWS_REGION"))
+	oneliners.FILE("AWS_SESSION_TOKEN:", os.Getenv("AWS_SESSION_TOKEN"))
+
 	if r.hostedZoneID != "" {
 		return r.hostedZoneID, nil
 	}
