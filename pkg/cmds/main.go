@@ -8,6 +8,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	_ "k8s.io/client-go/kubernetes/fake"
+	"os"
 )
 
 func NewCmdVoyager(version string) *cobra.Command {
@@ -19,6 +20,8 @@ func NewCmdVoyager(version string) *cobra.Command {
 			c.Flags().VisitAll(func(flag *pflag.Flag) {
 				log.Printf("FLAG: --%s=%q", flag.Name, flag.Value)
 			})
+			// https://docs.aws.amazon.com/sdk-for-go/api/aws/session/
+			os.Setenv("AWS_SDK_LOAD_CONFIG", "true")
 		},
 	}
 	rootCmd.PersistentFlags().AddGoFlagSet(flag.CommandLine)
