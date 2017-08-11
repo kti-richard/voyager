@@ -12,6 +12,7 @@ import (
 
 	"github.com/miekg/dns"
 	"golang.org/x/net/publicsuffix"
+	"github.com/tamalsaha/go-oneliners"
 )
 
 type preCheckDNSFunc func(fqdn, value string) (bool, error)
@@ -247,6 +248,7 @@ func FindZoneByFqdn(fqdn string, nameservers []string) (string, error) {
 			break
 		}
 
+		oneliners.FILE(domain, dns.TypeSOA, nameservers, true)
 		in, err := dnsQuery(domain, dns.TypeSOA, nameservers, true)
 		if err != nil {
 			return "", err
@@ -262,15 +264,20 @@ func FindZoneByFqdn(fqdn string, nameservers []string) (string, error) {
 		if in.Rcode == dns.RcodeSuccess {
 			for _, ans := range in.Answer {
 				if soa, ok := ans.(*dns.SOA); ok {
+					oneliners.FILE("fqdn:", fqdn)
+					oneliners.FILE("soa.Hdr.Name:", soa.Hdr.Name)
 					if strings.HasSuffix(fqdn, soa.Hdr.Name) {
+						oneliners.FILE()
 						zone := soa.Hdr.Name
 						fqdnToZone[fqdn] = zone
 						return zone, nil
 					} else if zone, err := publicsuffix.EffectiveTLDPlusOne(UnFqdn(fqdn)); err == nil {
+						oneliners.FILE()
 						zone = ToFqdn(zone)
 						fqdnToZone[fqdn] = zone
 						return zone, nil
 					} else {
+						oneliners.FILE()
 						zone = soa.Hdr.Name
 						fqdnToZone[fqdn] = zone
 						return zone, nil
